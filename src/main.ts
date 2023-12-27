@@ -16,6 +16,11 @@ async function bootstrap() {
      * @todo باید بر اساس اینکه در پروداکشن هستیم یا دولوپمنت پیاده سازی شود
      */
     disableErrorMessages: false,
+    /** پراپرتی‌هایی که درون
+     * dto
+     * تعریف نشده‌اند حذف شوند و به فایل کنترلر تحویل داده نشوند.
+     */
+    whitelist: true,
   }));
 
   await app.listen(PORT)
