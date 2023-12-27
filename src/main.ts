@@ -7,6 +7,7 @@ const PORT = 3030
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    /** سرور در هنگام ارورهای هندل نشده کرش نکند */
     abortOnError: false
   })
   app.useGlobalPipes(new ValidationPipe({
