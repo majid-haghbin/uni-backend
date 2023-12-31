@@ -13,6 +13,15 @@ async function bootstrap() {
   })
 
   app.use(helmet)
+  /**
+   * @todo Should fix origin value 
+   */
+  app.enableCors({
+    origin: [
+      'http://localhost:8080', 
+    ],
+    credentials: true
+  })
   app.useGlobalPipes(new ValidationPipe({
     /** 
      * مقدار زیر تعیین می‌کند که خطاهای 400 با جزئیات نمایش داده شوند یا خیر
