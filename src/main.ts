@@ -12,7 +12,7 @@ async function bootstrap() {
     abortOnError: false
   })
 
-  app.use(helmet)
+  app.use(helmet())
   /**
    * @todo Should fix origin value 
    */
