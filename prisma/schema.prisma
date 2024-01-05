@@ -10,6 +10,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        Int       @default(autoincrement()) @id
+  name      String
+  family    String
+}
+
 model TestEntity {
   id  Int  @default(autoincrement()) @id
 }
