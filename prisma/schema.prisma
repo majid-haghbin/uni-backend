@@ -48,6 +48,7 @@ model Lesson {
   professorID   Int
 
   pickedLessons PickedLesson[]
+  exams         Exam[]
 }
 
 model PickedLesson {
@@ -63,6 +64,9 @@ model PickedLesson {
 model Exam {
   id        Int       @default(autoincrement()) @id
   name      String
+
+  lessonID  Int
+  lesson    Lesson    @relation(fields: [lessonID], references: [id])  
 }
 
 model ExamAttempt {
