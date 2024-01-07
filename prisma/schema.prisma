@@ -22,6 +22,7 @@ model Student {
   family    String
 
   pickedLessons PickedLesson[]
+  attempts  ExamAttempt[]
 }
 
 model Professor {
@@ -66,9 +67,17 @@ model Exam {
   name      String
 
   lessonID  Int
-  lesson    Lesson    @relation(fields: [lessonID], references: [id])  
+  lesson    Lesson    @relation(fields: [lessonID], references: [id])
+
+  attempts  ExamAttempt[]
 }
 
 model ExamAttempt {
-  id        Int       @default(autoincrement()) @id
+  @@id([examID, studentID])
+
+  examID    Int
+  exam      Exam    @relation(fields: [examID], references: [id])
+
+  studentID   Int
+  student     Student   @relation(fields: [studentID], references: [id])
 }
