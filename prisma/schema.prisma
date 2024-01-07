@@ -10,12 +10,61 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Admin {
   id        Int       @default(autoincrement()) @id
   name      String
   family    String
 }
 
-model TestEntity {
-  id  Int  @default(autoincrement()) @id
+model Student {
+  id        Int       @default(autoincrement()) @id
+  name      String
+  family    String
+
+  pickedLessons PickedLesson[]
+}
+
+model Professor {
+  id        Int       @default(autoincrement()) @id
+  name      String
+  family    String
+  lessons   Lesson[]
+}
+
+model Major {
+  id        Int       @default(autoincrement()) @id
+  name      String
+  lessons   Lesson[]
+}
+
+model Lesson {
+  id            Int       @default(autoincrement()) @id
+  name          String
+
+  major         Major     @relation(fields: [majorID], references: [id])
+  majorID       Int
+
+  professor     Professor @relation(fields: [professorID], references: [id])
+  professorID   Int
+
+  pickedLessons PickedLesson[]
+}
+
+model PickedLesson {
+  @@id([lessonID, studentID])
+
+  lessonID    Int
+  lesson      Lesson    @relation(fields: [lessonID], references: [id])
+
+  studentID   Int
+  student     Student   @relation(fields: [studentID], references: [id])
+}
+
+model Exam {
+  id        Int       @default(autoincrement()) @id
+  name      String
+}
+
+model ExamAttempt {
+  id        Int       @default(autoincrement()) @id
 }
