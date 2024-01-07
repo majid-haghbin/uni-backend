@@ -4,7 +4,7 @@ import { AppService } from './app.service'
 import { ConfigModule } from '@nestjs/config'
 import { PrismaService } from './database/prisma.service'
 import { StudentsService } from './students/students.service'
-import { ProfessorService } from './professor/professor.service'
+import { ProfessorsService } from './professors/professors.service'
 
 @Module({
   imports: [
@@ -18,7 +18,7 @@ import { ProfessorService } from './professor/professor.service'
     AppService,
     PrismaService,
     StudentsService,
-    ProfessorService
+    ProfessorsService
   ],
 })
 export class AppModule {}

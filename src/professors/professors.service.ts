@@ -3,7 +3,7 @@ import { Professor } from '@prisma/client'
 import { PrismaService } from 'src/database/prisma.service'
 
 @Injectable()
-export class ProfessorService {
+export class ProfessorsService {
   constructor(private prisma: PrismaService) {}
 
   findOne(id: number): Promise<Professor | undefined> {
