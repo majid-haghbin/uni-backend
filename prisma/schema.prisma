@@ -112,6 +112,7 @@ model ExamAttempt {
 }
 
 enum Role {
+  superAdmin
   admin
   student
   professor
