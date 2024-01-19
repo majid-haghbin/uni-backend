@@ -18,6 +18,7 @@ model User {
   mobile String @unique
   email String @unique
   role Role @default(student)
+  password String @default("")
 
   adminID       Int?        @unique
   admin         Admin?     @relation(fields: [adminID], references: [id])
