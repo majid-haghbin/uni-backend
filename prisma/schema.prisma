@@ -19,13 +19,13 @@ model User {
   email String @unique
   role Role @default(student)
 
-  adminID       Int        @unique
+  adminID       Int?        @unique
   admin         Admin?     @relation(fields: [adminID], references: [id])
 
-  studentID       Int        @unique
+  studentID       Int?        @unique
   student         Student?     @relation(fields: [studentID], references: [id])
 
-  professorID       Int        @unique
+  professorID       Int?         @unique
   professor         Professor?     @relation(fields: [professorID], references: [id])
 }
 
