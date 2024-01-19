@@ -6,21 +6,42 @@ import { PrismaService } from './database/prisma.service'
 import { StudentsService } from './students/students.service'
 import { ProfessorsService } from './professors/professors.service'
 import { AdminsService } from './admins/admins.service'
+import { UsersService } from './users/users.service'
+import { AuthService } from './auth/auth.service'
+import { UsersController } from './users/users.controller'
+import { AdminsController } from './admins/admins.controller'
+import { AuthController } from './auth/auth.controller'
+import { JwtModule, JwtService } from '@nestjs/jwt'
+import { jwtConstants } from './auth/constants'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       /** نیازی به ایمپورت کردن در مابقی ماژول‌ها نباشد */
       isGlobal: true,
-    })
+    }),
+    JwtModule.register({
+      global: true,
+      /** @todo باید مقدار رمز از درون متغیر‌های محیطی خوانده شود که امن باشد */
+      secretOrKeyProvider: () => jwtConstants.secret,
+    }),
   ],
-  controllers: [AppController],
+  controllers: [
+    AppController,
+    UsersController,
+    AdminsController,
+    AuthController
+  ],
   providers: [
     AppService,
     PrismaService,
     StudentsService,
     ProfessorsService,
-    AdminsService
+    AdminsService,
+    UsersService,
+    AuthService,
+    JwtService
   ],
+  exports: [AuthService]
 })
 export class AppModule {}
