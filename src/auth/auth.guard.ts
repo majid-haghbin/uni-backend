@@ -8,14 +8,12 @@ import { JwtService } from '@nestjs/jwt'
 import { jwtConstants } from './constants'
 import { Request } from 'express'
 import { UsersService } from 'src/users/users.service'
-import { PrismaService } from 'src/database/prisma.service'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
-    private prisma: PrismaService
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
