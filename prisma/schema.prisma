@@ -15,7 +15,7 @@ model User {
   name String
   family String
   fatherName String?
-  mobile Int @unique
+  mobile String @unique
   email String @unique
   role Role @default(student)
 
