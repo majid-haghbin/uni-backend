@@ -1,5 +1,5 @@
-import { Body, Controller, Headers, Post, Res } from "@nestjs/common"
-import { CreateAdminDTO } from "src/users/dto/createUser.dto"
+import { Body, Controller, Post } from "@nestjs/common"
+import { CreateAdminDTO } from "src/admins/dto/create-admin.dto"
 import { AdminsService } from "./admins.service"
 
 

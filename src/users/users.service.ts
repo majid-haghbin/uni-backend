@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { Prisma, User } from '@prisma/client'
 import { PrismaService } from 'src/database/prisma.service'
-import { CreateAdminDTO, Roles } from './dto/createUser.dto'
+import { Roles } from './dto/users.dto'
 import { DefaultArgs } from '@prisma/client/runtime/library'
+import { CreateAdminDTO } from 'src/admins/dto/create-admin.dto'
 
 @Injectable()
 export class UsersService {

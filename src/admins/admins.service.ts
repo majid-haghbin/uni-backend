@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { PrismaService } from 'src/database/prisma.service'
-import { CreateAdminDTO } from 'src/users/dto/createUser.dto'
+import { CreateAdminDTO } from './dto/create-admin.dto'
 
 @Injectable()
 export class AdminsService {
