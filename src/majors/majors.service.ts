@@ -22,4 +22,16 @@ export class MajorsService {
     }
   }
 
+  async getMajors() {
+    const majors = await this.prisma.major.findMany()
+    
+    return majors.map(major => {
+      return {
+        ...major,
+        created: Number(major.created),
+        updated: Number(major.updated)
+      }
+    })
+  }
+
 }

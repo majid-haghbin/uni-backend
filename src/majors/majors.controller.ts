@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UnauthorizedException, UseGuards } from "@nestjs/common"
+import { Body, Controller, Get, Post, Req, UnauthorizedException, UseGuards } from "@nestjs/common"
 import { MajorsService } from "./majors.service"
 import { CreateMajorDTO } from "./dto/major.dto"
 import { AdminGuard } from "src/auth/admin.guard"
@@ -17,5 +17,12 @@ export class MajorsController {
       minimumUnits: body.minimumUnits
     })
     return major
+  }
+
+  @UseGuards(AdminGuard)
+  @Get('/list')
+  async list() {
+    const majors = await this.majorsService.getMajors()
+    return majors
   }
 }
