@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common"
+import { BadRequestException, HttpException, Injectable } from "@nestjs/common"
 import { PrismaService } from "src/database/prisma.service"
 
 @Injectable()
@@ -19,6 +19,28 @@ export class MajorsService {
       ...major,
       created: Number(major.created),
       updated: Number(major.updated)
+    }
+  }
+
+  async updateMajor(body: { id: number, name: string, minimumUnits: number }) {
+    const { id, ...data } = body
+
+    const retrievedMajor = await this.prisma.major.findUnique({
+      where: { id: body.id }
+    })
+    if (!retrievedMajor) return new BadRequestException('آیدی رشته تحصیلی را درست وارد کنید')
+    
+    const response = await this.prisma.major.update({
+      where: { id },
+      data: {
+        ...data,
+        updated: Date.now()
+      }
+    })
+    return {
+      ...response,
+      created: Number(response.created),
+      updated: Number(response.updated)
     }
   }
 

@@ -11,12 +11,14 @@ export class MajorsController {
   @Post('/create')
   async create(@Body() body: CreateMajorDTO, @Req() req: any) {
     if (req.user.role === 'admin') return new UnauthorizedException()
-
-    const major = await this.majorsService.createMajor({
-      name: body.name,
-      minimumUnits: body.minimumUnits
-    })
-    return major
+    
+    let response
+    if (body.id == undefined) {
+      response = await this.majorsService.createMajor(body)
+    } else {
+      response = await this.majorsService.updateMajor(body)
+    }
+    return response
   }
 
   @UseGuards(AdminGuard)
