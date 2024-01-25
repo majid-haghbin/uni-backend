@@ -50,8 +50,8 @@ model Student {
 
 model Professor {
   id        Int       @default(autoincrement()) @id
-  name      String
-  family    String
+  // تاریخ شروع به کار
+  dateOfEmployment String
   
   user User?
 
