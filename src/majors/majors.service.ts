@@ -8,7 +8,7 @@ export class MajorsService {
   async createMajor(body: { name: string, minimumUnits: number }) {
     const major = await this.prisma.major.create({
       data: {
-        name: body.name,
+        name: body.name.trim(),
         minimumUnits: body.minimumUnits,
         created: Date.now(),
         updated: Date.now()
@@ -34,6 +34,7 @@ export class MajorsService {
       where: { id },
       data: {
         ...data,
+        name: body.name.trim(),
         updated: Date.now()
       }
     })
