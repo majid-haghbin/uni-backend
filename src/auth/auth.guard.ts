@@ -3,48 +3,60 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
+  mixin
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { jwtConstants } from './constants'
 import { Request } from 'express'
 import { UsersService } from 'src/users/users.service'
+import { Role } from 'src/users/dto/users.dto'
 
-@Injectable()
-export class AuthGuard implements CanActivate {
-  constructor(
-    private jwtService: JwtService,
-    private usersService: UsersService,
-  ) {}
+export const AuthGuard = (roles: Role[]) => {
+  @Injectable()
+  class AuthGuardMixin implements CanActivate {
+    constructor(
+      public jwtService: JwtService,
+      public usersService: UsersService,
+    ) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest()
-    const token = this.extractTokenFromHeader(request)
-    if (!token) {
-      throw new UnauthorizedException()
+    async canActivate(context: ExecutionContext): Promise<boolean> {
+      const request = context.switchToHttp().getRequest()
+      const token = this.extractTokenFromHeader(request)
+      if (!token) {
+        throw new UnauthorizedException()
+      }
+      try {
+        const payload = await this.jwtService.verifyAsync(
+          token,
+          {
+            secret: jwtConstants.secret
+          }
+        )
+        const user = await this.usersService.findUser({
+          where: { mobile: payload.username }
+        })
+
+        console.log(user)
+        console.log(roles)
+
+        if (!roles.includes(user.role)) return false
+
+        // 💡 We're assigning the payload to the request object here
+        // so that we can access it in our route handlers
+        request['user'] = user
+
+      } catch {
+        throw new UnauthorizedException()
+      }
+      return request
     }
-    try {
-      const payload = await this.jwtService.verifyAsync(
-        token,
-        {
-          secret: jwtConstants.secret
-        }
-      )
-      const user = await this.usersService.findUser({
-        where: { mobile: payload.username }
-      })
 
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
-      request['user'] = user
-
-    } catch {
-      throw new UnauthorizedException()
+    extractTokenFromHeader(request: Request): string | undefined {
+      const [type, token] = request.headers.authorization?.split(' ') ?? []
+      return type === 'Bearer' ? token : undefined
     }
-    return request
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? []
-    return type === 'Bearer' ? token : undefined
-  }
+  const guard = mixin(AuthGuardMixin)
+  return guard
 }
