@@ -38,4 +38,40 @@ export class StudentsService {
     })
     return student
   }
+
+  async update(body: CreateStudentDTO) {
+    const student = await this.prisma.user.findUnique({
+      where: { ID: body.ID }
+    })
+    if (!student) return new BadRequestException('آیدی دانشجو صحیح نیست')
+
+    const major = await this.prisma.major.findUnique({
+      where: { id: body.majorID }
+    })
+    if (!major) return new BadRequestException('آیدی رشته تحصیلی اشتباه است')
+
+    const updatedStudent = await this.prisma.user.update({
+      where: { ID: body.ID },
+      data: {
+        name: body.name,
+        family: body.family,
+        fatherName: body.fatherName,
+        mobile: body.mobile,
+        email: body.email,
+        password: body.password,
+
+        student: {
+          update: {
+            where: { id: student.studentID },
+            data: {
+              birthDate: body.birthDate,
+              code: body.code,
+              majorID: body.majorID,
+            }
+          }
+        }
+      }
+    })
+    return updatedStudent
+  }
 }

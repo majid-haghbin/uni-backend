@@ -12,7 +12,11 @@ export class StudentsController {
   async create(@Body() body: CreateStudentDTO) {
 
     let response
-    response = await this.studentsService.create(body)
+    if (body.ID === undefined) {
+      response = await this.studentsService.create(body)
+    } else {
+      response = await this.studentsService.update(body)
+    }
     return response
   }
 }
