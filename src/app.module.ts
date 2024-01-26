@@ -18,6 +18,7 @@ import { MajorsService } from './majors/majors.service'
 import { ProfessorsController } from './professors/professors.controller'
 import { LessonsController } from './lessons/lessons.controller'
 import { LessonsService } from './lessons/lessons.service'
+import { StudentsController } from './students/students.controller'
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { LessonsService } from './lessons/lessons.service'
     MajorsController,
     ProfessorsController,
     LessonsController,
+    StudentsController,
   ],
   providers: [
     AppService,
@@ -51,6 +53,7 @@ import { LessonsService } from './lessons/lessons.service'
     JwtService,
     MajorsService,
     LessonsService,
+    StudentsService,
   ],
   exports: [AuthService]
 })
