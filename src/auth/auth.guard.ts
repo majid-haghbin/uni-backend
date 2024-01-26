@@ -36,9 +36,6 @@ export const AuthGuard = (roles: Role[]) => {
           where: { mobile: payload.username }
         })
 
-        console.log(user)
-        console.log(roles)
-
         if (!roles.includes(user.role)) return false
 
         // 💡 We're assigning the payload to the request object here
