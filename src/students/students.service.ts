@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/database/prisma.service'
 import { CreateStudentDTO } from './dto/create-student.dto'
+import { AddToLessonDTO } from './dto/add-to-lesson.dto'
 
 @Injectable()
 export class StudentsService {
@@ -73,5 +74,36 @@ export class StudentsService {
       }
     })
     return updatedStudent
+  }
+
+  async addToLesson(body: AddToLessonDTO) {
+    const user = await this.prisma.user.findUnique({
+      where: { ID: body.studentID },
+      include: {
+        student: true
+      }
+    })
+    if (!user || user.role !== 'student' || !user.student) return new BadRequestException('آیدی دانشجو اشتباه است')
+    const { student } = user
+
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { id: body.lessonID }
+    })
+    if (!lesson) return new BadRequestException('آیدی درس اشتباه است')
+    if (student.majorID !== lesson.majorID) {
+      return new BadRequestException('درس برای رشته دیگری ارائه شده است')
+    }
+
+    const response = await this.prisma.pickedLesson.create({
+      data: {
+        student: {
+          connect: { id: student.id }
+        },
+        lesson: {
+          connect: { id: body.lessonID }
+        }
+      }
+    })
+    return response
   }
 }
