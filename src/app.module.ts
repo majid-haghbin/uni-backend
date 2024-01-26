@@ -16,6 +16,8 @@ import { jwtConstants } from './auth/constants'
 import { MajorsController } from './majors/majors.controller'
 import { MajorsService } from './majors/majors.service'
 import { ProfessorsController } from './professors/professors.controller'
+import { LessonsController } from './lessons/lessons.controller'
+import { LessonsService } from './lessons/lessons.service'
 
 @Module({
   imports: [
@@ -35,7 +37,8 @@ import { ProfessorsController } from './professors/professors.controller'
     AdminsController,
     AuthController,
     MajorsController,
-    ProfessorsController
+    ProfessorsController,
+    LessonsController,
   ],
   providers: [
     AppService,
@@ -46,7 +49,8 @@ import { ProfessorsController } from './professors/professors.controller'
     UsersService,
     AuthService,
     JwtService,
-    MajorsService
+    MajorsService,
+    LessonsService,
   ],
   exports: [AuthService]
 })
