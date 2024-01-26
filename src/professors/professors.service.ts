@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { Professor, Prisma } from '@prisma/client'
 import { PrismaService } from 'src/database/prisma.service'
 import { CreateProfessorDTO } from './dto/create-professor.dto'
@@ -18,6 +18,7 @@ export class ProfessorsService {
       data: {
         name: body.name.trim(),
         family: body.family.trim(),
+        fatherName: body.fatherName.trim(),
         email: body.email.trim(),
         mobile: body.mobile.trim(),
         role: 'professor',
@@ -32,4 +33,37 @@ export class ProfessorsService {
     return createdProfessor
   }
 
+  async update(body: CreateProfessorDTO) {
+    const user = await this.prisma.user.findUnique({
+      where: { ID: body.ID }
+    })
+    if (!user || user.role !== 'professor') return new BadRequestException('آیدی استاد را درست وارد کنید')
+
+    const updatedProfessor = await this.prisma.user.update({
+      where: {
+        ID: body.ID,
+      },
+      data: {
+        name: body.name.trim(),
+        family: body.family.trim(),
+        fatherName: body.fatherName.trim(),
+        email: body.email.trim(),
+        mobile: body.mobile.trim(),
+        password: body.password.trim(),
+        professor: {
+          update: {
+            where: {
+              user: {
+                ID: body.ID
+              }
+            },
+            data: {
+              dateOfEmployment: body.dateOfEmployment
+            }
+          }
+        }
+      },
+    })
+    return updatedProfessor
+  }
 }

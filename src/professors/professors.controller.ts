@@ -15,7 +15,7 @@ export class ProfessorsController {
     if (body.ID === undefined) {
       response = await this.professorsService.create(body)
     } else {
-      // response = await this.majorsService.updateMajor(body)
+      response = await this.professorsService.update(body)
     }
     return response
   }
