@@ -75,6 +75,7 @@ model Major {
 model Lesson {
   id            Int       @default(autoincrement()) @id
   name          String
+  unit          Int
 
   major         Major     @relation(fields: [majorID], references: [id])
   majorID       Int
