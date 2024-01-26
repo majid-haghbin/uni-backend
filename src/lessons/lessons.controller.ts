@@ -15,4 +15,11 @@ export class LessonsController {
     const lesson = await this.lessonsService.create(body)
     return lesson
   }
+
+  @UseGuards(AuthGuard(['superAdmin', 'admin']))
+  @Get('list')
+  async list() {
+    const lessons = await this.lessonsService.list()
+    return lessons
+  }
 }

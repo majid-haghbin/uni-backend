@@ -36,4 +36,8 @@ export class LessonsService {
     return lesson
   }
 
+  async list() {
+    const lessons = await this.prisma.lesson.findMany()
+    return lessons
+  }
 }
