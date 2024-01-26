@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UnauthorizedException, UseGuards } from "@nestjs/common"
+import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common"
 import { AuthGuard } from "src/auth/auth.guard"
 import { ProfessorsService } from "./professors.service"
 import { CreateProfessorDTO } from "./dto/create-professor.dto"
@@ -18,5 +18,11 @@ export class ProfessorsController {
       response = await this.professorsService.update(body)
     }
     return response
+  }
+
+  @UseGuards(AuthGuard(['superAdmin', 'admin']))
+  @Get('/list')
+  async list() {
+    return this.professorsService.list()
   }
 }

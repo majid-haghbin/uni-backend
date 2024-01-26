@@ -66,4 +66,20 @@ export class ProfessorsService {
     })
     return updatedProfessor
   }
+
+  async list() {
+    const professors = await this.prisma.user.findMany({
+      where: {
+        role: 'professor'
+      },
+      select: {
+        ID: true,
+        name: true,
+        family: true,
+        mobile: true,
+        email: true,
+      }
+    })
+    return professors
+  }
 }
