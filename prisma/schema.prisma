@@ -38,6 +38,8 @@ model Admin {
 
 model Student {
   id        Int       @default(autoincrement()) @id
+  birthDate   String
+  code        String
 
   user User?
 
