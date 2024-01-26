@@ -15,6 +15,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt'
 import { jwtConstants } from './auth/constants'
 import { MajorsController } from './majors/majors.controller'
 import { MajorsService } from './majors/majors.service'
+import { ProfessorsController } from './professors/professors.controller'
 
 @Module({
   imports: [
@@ -33,7 +34,8 @@ import { MajorsService } from './majors/majors.service'
     UsersController,
     AdminsController,
     AuthController,
-    MajorsController
+    MajorsController,
+    ProfessorsController
   ],
   providers: [
     AppService,
