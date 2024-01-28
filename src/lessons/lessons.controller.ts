@@ -1,7 +1,8 @@
-import { BadRequestException, Body, Controller, Get, Post, UseGuards } from "@nestjs/common"
+import { BadRequestException, Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common"
 import { AuthGuard } from "src/auth/auth.guard"
 import { LessonsService } from "./lessons.service"
 import { CreateLessonDTO } from "./dto/create-lesson.dto"
+import { RequestWithUser } from "type"
 
 @Controller('lesson')
 export class LessonsController {
@@ -16,10 +17,19 @@ export class LessonsController {
     return lesson
   }
 
-  @UseGuards(AuthGuard(['superAdmin', 'admin']))
+  @UseGuards(AuthGuard(['superAdmin', 'admin', 'professor', 'student']))
   @Get('list')
-  async list() {
-    const lessons = await this.lessonsService.list()
-    return lessons
+  async list(@Req() request: RequestWithUser) {
+    const user = request.user
+    let response
+
+    if (user.role === 'professor') {
+      response = await this.lessonsService.professorsLessons(user.professorID)
+    } else if (user.role === 'student') {
+      response = await this.lessonsService.studentsLessons(user.studentID)
+    } else {
+      response = await this.lessonsService.list()
+    }
+    return response
   }
 }

@@ -40,4 +40,28 @@ export class LessonsService {
     const lessons = await this.prisma.lesson.findMany()
     return lessons
   }
+
+  /**
+   * لیست دروس استاد مدنظر را برمی‌گرداند
+   */
+  async professorsLessons(professorID: number) {
+    return this.prisma.lesson.findMany({
+      where: { professorID }
+    })
+  }
+
+  
+  /**
+   * لیست دروس دانشجو مدنظر را برمی‌گرداند
+   */
+  async studentsLessons(studentID: number) {
+    const lessons = await this.prisma.pickedLesson.findMany({
+      where: { studentID,  },
+      include: {
+        lesson: true
+      }
+    })
+
+    return lessons.map(item => item.lesson)
+  }
 }
