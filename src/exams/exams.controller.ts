@@ -8,7 +8,7 @@ import { ExamListDto } from "./dto/exam-list.dto"
 export class ExamsController {
   constructor(private readonly examsService: ExamsService) {}
 
-  @UseGuards(AuthGuard(['professor']))
+  @UseGuards(AuthGuard(['professor', 'student']))
   @Post('list')
   async create(@Body() body: ExamListDto, @Req() request: RequestWithUser) {
     const { role: userRole } = request.user
@@ -16,6 +16,10 @@ export class ExamsController {
     let response
     if (userRole === 'professor') {
       response = await this.examsService.professorExams(body.lessonID, request.user.professorID)
+    } else if (userRole === 'student') {
+      response = await this.examsService.studentExams(body.lessonID, request.user.studentID)
+    } else {
+      response = await this.examsService.examsListForAdmin(body.lessonID)
     }
     return response
   }
