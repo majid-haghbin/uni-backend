@@ -19,6 +19,8 @@ import { ProfessorsController } from './professors/professors.controller'
 import { LessonsController } from './lessons/lessons.controller'
 import { LessonsService } from './lessons/lessons.service'
 import { StudentsController } from './students/students.controller'
+import { ExamsController } from './exams/exams.controller'
+import { ExamsService } from './exams/exams.service'
 
 @Module({
   imports: [
@@ -41,6 +43,7 @@ import { StudentsController } from './students/students.controller'
     ProfessorsController,
     LessonsController,
     StudentsController,
+    ExamsController,
   ],
   providers: [
     AppService,
@@ -54,6 +57,7 @@ import { StudentsController } from './students/students.controller'
     MajorsService,
     LessonsService,
     StudentsService,
+    ExamsService,
   ],
   exports: [AuthService]
 })
