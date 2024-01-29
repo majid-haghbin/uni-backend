@@ -102,6 +102,9 @@ model PickedLesson {
 model Exam {
   id        Int       @default(autoincrement()) @id
   title      String
+  startDate  String
+  endDate    String
+  maxAttempt Int
   created   String
   updated   String
   description String?
