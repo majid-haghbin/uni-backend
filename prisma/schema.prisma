@@ -119,7 +119,7 @@ model Exam {
 
 model Question {
   id Int @id @default(autoincrement())
-  text  String
+  title  String
   isMultiChoice Boolean
   // نمره سوال
   marks Float
