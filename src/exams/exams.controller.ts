@@ -3,6 +3,7 @@ import { AuthGuard } from "src/auth/auth.guard"
 import { ExamsService } from "./exams.service"
 import { RequestWithUser } from "type"
 import { ExamListDto } from "./dto/exam-list.dto"
+import { CreateExamDto } from "./dto/create-exam.dto"
 
 @Controller('exam')
 export class ExamsController {
@@ -10,7 +11,7 @@ export class ExamsController {
 
   @UseGuards(AuthGuard(['professor', 'student']))
   @Post('list')
-  async create(@Body() body: ExamListDto, @Req() request: RequestWithUser) {
+  async list(@Body() body: ExamListDto, @Req() request: RequestWithUser) {
     const { role: userRole } = request.user
 
     let response
@@ -24,4 +25,11 @@ export class ExamsController {
     return response
   }
 
+  @UseGuards(AuthGuard(['professor']))
+  @Post('create')
+  async create(@Body() body: CreateExamDto, @Req() request: RequestWithUser) {
+    const exam = await this.examsService.createExam(body, request.user.professorID)
+    
+    return exam
+  }
 }

@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/database/prisma.service'
+import { CreateExamDto } from './dto/create-exam.dto'
 
 @Injectable()
 export class ExamsService {
@@ -55,5 +56,54 @@ export class ExamsService {
     })
 
     return exams
+  }
+  
+  /**
+   * ایجاد آزمون
+   * @param body 
+   * @param professorID آیدی استادی که می‌خواهد درس را ایجاد کند
+   * @returns 
+   */
+  async createExam(body: CreateExamDto, professorID: number) {
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { id: body.lessonID, professorID }
+    })
+    
+    if (!lesson) return new BadRequestException('آیدی درس اشتباه است')
+    
+    const now = Date.now()
+
+    const questions = body.questions.map(item => {
+      return {
+        title: item.title,
+        isMultiChoice: item.isMultiChoice,
+        marks: item.marks,
+      }
+    })
+
+    const exam = await this.prisma.exam.create({
+      data: {
+        lesson: {
+          connect: { id: body.lessonID }
+        },
+        title: body.title,
+        description: body.description,
+        created: now.toString(),
+        updated: now.toString(),
+        startDate: body.startDate,
+        endDate: body.endDate,
+        maxAttempt: body.maxAttempt,
+        questions: {
+          createMany: {
+            data: questions,
+          }
+        }
+      },
+      include: {
+        questions: true
+      }
+    })
+
+    return exam
   }
 }
