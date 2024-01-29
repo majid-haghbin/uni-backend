@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/database/prisma.service'
 import { CreateExamDto } from './dto/create-exam.dto'
 
@@ -71,16 +71,7 @@ export class ExamsService {
     
     if (!lesson) return new BadRequestException('آیدی درس اشتباه است')
     
-    const now = Date.now()
-
-    const questions = body.questions.map(item => {
-      return {
-        title: item.title,
-        isMultiChoice: item.isMultiChoice,
-        marks: item.marks,
-      }
-    })
-
+    const now = Date.now() / 1000
     const exam = await this.prisma.exam.create({
       data: {
         lesson: {
@@ -93,18 +84,46 @@ export class ExamsService {
         startDate: body.startDate,
         endDate: body.endDate,
         maxAttempt: body.maxAttempt,
-        questions: {
-          createMany: {
-            data: questions,
-          }
-        }
-      },
-      include: {
-        questions: true
       }
     })
 
+    body.questions.forEach(async question => {
+      await this.createQuestion(question, exam.id)
+    })
+
     return exam
+  }
+
+  /**
+   * برای درج یک سوال جدید
+   * @param question سوالی که قرار است در دیتابیس ثبت شود
+   * @param examID آیدی امتحانی که این سوال به آن مربوط می‌شود
+   * @returns سوالی که ایجاد شده
+   */
+  async createQuestion(question: CreateExamDto['questions'][number], examID: number) {
+    const createdQuestion = await this.prisma.question.create({
+      data: {
+        exam: {
+          connect: { id: examID }
+        },
+        title: question.title,
+        isMultiChoice: question.isMultiChoice,
+        marks: question.marks,
+      }
+    })
+
+    if (question.answers && question.answers.length) {
+      await this.prisma.choice.createMany({
+        data: question.answers.map(choice => {
+          return {
+            questionID: createdQuestion.id,
+            text: choice.text
+          }
+        })
+      })
+    }
+
+    return createdQuestion
   }
 
   async closeExam(examID: number, professorID: number) {
