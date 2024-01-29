@@ -101,12 +101,36 @@ model PickedLesson {
 
 model Exam {
   id        Int       @default(autoincrement()) @id
-  name      String
+  title      String
+  created   String
+  updated   String
+  description String?
+
+  questions Question[]
 
   lessonID  Int
   lesson    Lesson    @relation(fields: [lessonID], references: [id])
 
   attempts  ExamAttempt[]
+}
+
+model Question {
+  id Int @id @default(autoincrement())
+  text  String
+  isMultiChoice Boolean
+
+  examID  Int
+  exam Exam @relation(fields: [examID], references: [id])
+
+  choices Choice[]
+}
+
+model Choice {
+  id  Int @id @default(autoincrement())
+  text  String
+
+  questionID  Int
+  question Question @relation(fields: [questionID], references: [id])
 }
 
 model ExamAttempt {
