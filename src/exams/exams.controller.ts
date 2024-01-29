@@ -4,6 +4,7 @@ import { ExamsService } from "./exams.service"
 import { RequestWithUser } from "type"
 import { ExamListDto } from "./dto/exam-list.dto"
 import { CreateExamDto } from "./dto/create-exam.dto"
+import { CloseExamDto } from "./dto/close-exam.dto"
 
 @Controller('exam')
 export class ExamsController {
@@ -31,5 +32,12 @@ export class ExamsController {
     const exam = await this.examsService.createExam(body, request.user.professorID)
     
     return exam
+  }
+
+  @UseGuards(AuthGuard(['professor']))
+  @Post('close')
+  async close(@Body() body: CloseExamDto, @Req() request: RequestWithUser) {
+    const response = await this.examsService.closeExam(body.examID, request.user.professorID)
+    return response
   }
 }

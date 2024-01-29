@@ -106,4 +106,22 @@ export class ExamsService {
 
     return exam
   }
+
+  async closeExam(examID: number, professorID: number) {
+    const exam = await this.prisma.exam.findUnique({
+      where: { id: examID },
+      include: {
+        lesson: true
+      }
+    })
+
+    if (!exam || exam.lesson.professorID !== professorID) return new BadRequestException('آیدی درس اشتباه است')
+    
+    await this.prisma.exam.update({
+      where: { id: examID },
+      data: {
+        isClosed: true
+      }
+    })
+  }
 }
