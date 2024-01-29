@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `exam` MODIFY `maxAttempt` INTEGER NOT NULL DEFAULT 1;
