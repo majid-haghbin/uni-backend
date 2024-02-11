@@ -21,7 +21,7 @@ export class UsersController {
   @UseGuards(AuthGuard(['superAdmin', 'admin', 'professor', 'student']))
   @Get('profile')
   async getProfile(@Req() request: RequestWithUser) {
-    const profile = request.user
+    const { password, adminID, professorID, studentID ,...profile} = request.user
 
     return this.appService.myResponse({ profile })
   }
