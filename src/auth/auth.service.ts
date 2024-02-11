@@ -2,12 +2,14 @@ import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/c
 import { UsersService } from '../users/users.service'
 import { JwtService } from '@nestjs/jwt'
 import { jwtConstants } from './constants'
+import { AppService } from 'src/app.service'
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private appService: AppService
   ) {}
 
   async signIn(username: string, password: string): Promise<any> {
@@ -21,12 +23,9 @@ export class AuthService {
 
     const payload = { sub: user.ID, username: user.mobile }
 
-    return {
-      body: {
-        access_token: await this.jwtService.signAsync(payload, {
-          secret: jwtConstants.secret
-        })
-      }
-    }
+    const token = await this.jwtService.signAsync(payload, {
+      secret: jwtConstants.secret
+    })
+    return this.appService.myResponse({ token })
   }
 }
