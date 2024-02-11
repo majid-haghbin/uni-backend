@@ -2,10 +2,14 @@ import { Body, Controller, Get, Post, Req, UnauthorizedException, UseGuards } fr
 import { MajorsService } from "./majors.service"
 import { CreateMajorDTO } from "./dto/major.dto"
 import { AuthGuard } from "src/auth/auth.guard"
+import { AppService } from "src/app.service"
 
 @Controller('major')
 export class MajorsController {
-  constructor(private readonly majorsService: MajorsService) {}
+  constructor(
+    private readonly majorsService: MajorsService,
+    private readonly appService: AppService
+  ) {}
 
   @UseGuards(AuthGuard(['superAdmin']))
   @Post('/create')
@@ -25,6 +29,6 @@ export class MajorsController {
   @Get('/list')
   async list() {
     const majors = await this.majorsService.getMajors()
-    return majors
+    return this.appService.myResponse({ majors })
   }
 }
