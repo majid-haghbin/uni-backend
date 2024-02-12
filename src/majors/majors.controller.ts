@@ -34,9 +34,9 @@ export class MajorsController {
   }
 
   @UseGuards(AuthGuard(['superAdmin', 'admin']))
-  @Post('/lessons')
+  @Post('/details')
   async majorDetails(@Body() body: MajorDetailsDTO) {
-    const major = await this.majorsService.getDetails(body.majorID)
-    return this.appService.myResponse({ major })
+    const details = await this.majorsService.getDetails(body.majorID)
+    return this.appService.myResponse(details)
   }
 }

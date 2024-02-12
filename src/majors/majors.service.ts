@@ -66,10 +66,16 @@ export class MajorsService {
     })
     if (!major) return new BadRequestException('آیدی رشته تحصیلی را درست وارد کنید')
 
+    const lessons = major.lessons
+    delete major.lessons
+    
     return {
-      ...major,
-      created: Number(major.created),
-      updated: Number(major.updated)
+      major: {
+        ...major,
+        created: Number(major.created),
+        updated: Number(major.updated)
+      },
+      lessons,
     }
   }
 }
