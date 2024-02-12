@@ -57,4 +57,19 @@ export class MajorsService {
     })
   }
 
+  async getDetails(majorID: number) {
+    const major = await this.prisma.major.findUnique({
+      where: { id: majorID },
+      include: {
+        lessons: true
+      }
+    })
+    if (!major) return new BadRequestException('آیدی رشته تحصیلی را درست وارد کنید')
+
+    return {
+      ...major,
+      created: Number(major.created),
+      updated: Number(major.updated)
+    }
+  }
 }

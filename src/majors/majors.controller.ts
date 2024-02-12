@@ -3,6 +3,7 @@ import { MajorsService } from "./majors.service"
 import { CreateMajorDTO } from "./dto/major.dto"
 import { AuthGuard } from "src/auth/auth.guard"
 import { AppService } from "src/app.service"
+import { MajorDetailsDTO } from "./dto/major-details.dto"
 
 @Controller('major')
 export class MajorsController {
@@ -30,5 +31,12 @@ export class MajorsController {
   async list() {
     const majors = await this.majorsService.getMajors()
     return this.appService.myResponse({ majors })
+  }
+
+  @UseGuards(AuthGuard(['superAdmin', 'admin']))
+  @Post('/lessons')
+  async majorDetails(@Body() body: MajorDetailsDTO) {
+    const major = await this.majorsService.getDetails(body.majorID)
+    return this.appService.myResponse({ major })
   }
 }
