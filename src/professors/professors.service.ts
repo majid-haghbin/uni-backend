@@ -2,10 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { Professor, Prisma } from '@prisma/client'
 import { PrismaService } from 'src/database/prisma.service'
 import { CreateProfessorDTO } from './dto/create-professor.dto'
+import { UsersService } from 'src/users/users.service'
 
 @Injectable()
 export class ProfessorsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private userService: UsersService
+  ) {}
 
   findOne(id: number): Promise<Professor | undefined> {
     return this.prisma.professor.findUnique({
@@ -14,14 +18,20 @@ export class ProfessorsService {
   }
 
   async create(body: CreateProfessorDTO) {
+    const submittedWithSameMobile = await this.userService.findWithMobile(body.mobile)
+    if (submittedWithSameMobile) return new BadRequestException('کاربری با این شماره همراه قبلا ثبت شده است')
+
+    const submittedWithSameEmail = await this.userService.findWithEmail(body.email)
+    if (submittedWithSameEmail) return new BadRequestException('کاربری با این ایمیل قبلا ثبت شده است')
+
     const createdProfessor = await this.prisma.user.create({
       data: {
+        role: 'professor',
         name: body.name.trim(),
         family: body.family.trim(),
         fatherName: body.fatherName.trim(),
         email: body.email.trim(),
         mobile: body.mobile.trim(),
-        role: 'professor',
         password: body.password,
         professor: {
           create: {

@@ -9,6 +9,18 @@ import { CreateAdminDTO } from 'src/admins/dto/create-admin.dto'
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
+  findWithEmail(email: string) {
+    return this.prisma.user.findFirst({
+      where: { email }
+    })
+  }
+
+  findWithMobile(mobile: string) {
+    return this.prisma.user.findFirst({
+      where: { mobile }
+    })
+  }
+
   async createAdmin(user: CreateAdminDTO) {
     const result = await this.prisma.user.create({
       data: {

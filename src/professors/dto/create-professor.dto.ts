@@ -24,7 +24,7 @@ export class CreateProfessorDTO {
   mobile: string
 
   @IsNotEmpty()
-  @IsEmail()
+  @IsEmail({}, { message: 'ایمیل را صحیح وارد کنید' })
   email: string
 
   @IsNotEmpty()
