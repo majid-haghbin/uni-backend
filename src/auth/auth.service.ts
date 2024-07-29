@@ -17,7 +17,7 @@ export class AuthService {
       where: { mobile: username }
     })
 
-    if (user.password !== password) {
+    if (!user || user.password !== password) {
       throw new ForbiddenException('نام کاربری یا رمز عبور اشتباه است')
     }
 
