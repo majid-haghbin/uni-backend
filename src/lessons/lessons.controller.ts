@@ -3,10 +3,14 @@ import { AuthGuard } from "src/auth/auth.guard"
 import { LessonsService } from "./lessons.service"
 import { CreateLessonDTO } from "./dto/create-lesson.dto"
 import { RequestWithUser } from "type"
+import { AppService } from "src/app.service"
 
 @Controller('lesson')
 export class LessonsController {
-  constructor(private readonly lessonsService: LessonsService) {}
+  constructor(
+    private readonly lessonsService: LessonsService,
+    private readonly appService: AppService
+  ) {}
 
   @UseGuards(AuthGuard(['superAdmin']))
   @Post('/create')
@@ -14,7 +18,7 @@ export class LessonsController {
     if (![1, 2, 3, 4].includes(body.unit)) return new BadRequestException('تعداد واحد درس را درست وارد کنید')
 
     const lesson = await this.lessonsService.create(body)
-    return lesson
+    return this.appService.myResponse({ lesson })
   }
 
   @UseGuards(AuthGuard(['superAdmin', 'admin', 'professor', 'student']))
