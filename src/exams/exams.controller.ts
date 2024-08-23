@@ -10,7 +10,7 @@ import { CloseExamDto } from "./dto/close-exam.dto"
 export class ExamsController {
   constructor(private readonly examsService: ExamsService) {}
 
-  @UseGuards(AuthGuard(['professor', 'student']))
+  @UseGuards(AuthGuard(['professor', 'student', 'superAdmin', 'admin']))
   @Post('list')
   async list(@Body() body: ExamListDto, @Req() request: RequestWithUser) {
     const { role: userRole } = request.user
