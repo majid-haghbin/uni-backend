@@ -117,4 +117,26 @@ export class LessonsService {
       exams,
     }
   }
+
+  /**
+   * برای دریافت جزئیات درس و آزمون‌های درس برای ادمین
+   * @param lessonID آیدی درس مدنظر
+   */
+  async getLessonDetails(lessonID: number) {
+    const lessonDetails = await this.prisma.lesson.findUnique({
+      where: { id: lessonID },
+      include: {
+        exams: true
+      }
+    })
+
+    if (!lessonDetails) return new BadRequestException('چنین درسی وجود ندارد')
+    
+    const exams = lessonDetails.exams
+    delete lessonDetails['exams']
+    return {
+      lesson: lessonDetails,
+      exams,
+    }
+  }
 }

@@ -33,7 +33,7 @@ export class LessonsController {
     } else if (userRole === 'student') {
       lessonDetails = await this.lessonsService.getStudentsLesson(body.lessonID, studentID)
     } else {
-      // lessonDetails = await this.lessonsService.getLessonDetails
+      lessonDetails = await this.lessonsService.getLessonDetails(body.lessonID)
     }
     return this.appService.myResponse({ ...lessonDetails })
   }
