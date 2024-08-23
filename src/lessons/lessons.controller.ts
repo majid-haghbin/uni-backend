@@ -25,15 +25,15 @@ export class LessonsController {
   @UseGuards(AuthGuard(['superAdmin', 'admin', 'professor', 'student']))
   @Post('/get')
   async get(@Req() request: RequestWithUser, @Body() body: GetLessonDTO) {
-    const user = request.user
+    const { professorID, studentID, role: userRole } = request.user
     let lessonDetails
 
-    if (user.role === 'professor') {
-      // lessons = await this.lessonsService.professorsLessons(user.professorID)
-    } else if (user.role === 'student') {
-      lessonDetails = await this.lessonsService.getStudentsLesson(body.lessonID, user.studentID)
+    if (userRole === 'professor') {
+      lessonDetails = await this.lessonsService.getProfessorsLessonDetails(body.lessonID, professorID)
+    } else if (userRole === 'student') {
+      lessonDetails = await this.lessonsService.getStudentsLesson(body.lessonID, studentID)
     } else {
-      // lessons = await this.lessonsService.list()
+      // lessonDetails = await this.lessonsService.getLessonDetails
     }
     return this.appService.myResponse({ ...lessonDetails })
   }

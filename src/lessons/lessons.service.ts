@@ -92,4 +92,29 @@ export class LessonsService {
       exams,
     }
   }
+
+  /**
+   * برای دریافت جزئیات درس مربوط به این استاد و آزمون‌های درس
+   * @param lessonID آیدی درس مدنظر
+   * @param professorID آیدی استاد مدنظر که از توکنش به دست می‌آید
+   */
+  async getProfessorsLessonDetails(lessonID: number, professorID: number) {
+    const lesson = await this.prisma.lesson.findUnique({
+      where: {
+        id: lessonID,
+        professorID,
+      }
+    })
+
+    if (!lesson) return new BadRequestException('شما چنین درسی ندارید')
+
+    const exams = await this.prisma.exam.findMany({
+      where: { lessonID }
+    })
+
+    return {
+      lesson,
+      exams,
+    }
+  }
 }
