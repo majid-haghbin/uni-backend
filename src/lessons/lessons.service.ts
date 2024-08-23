@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/database/prisma.service'
 import { CreateLessonDTO } from './dto/create-lesson.dto'
-
+import { ExamsService } from 'src/exams/exams.service'
 @Injectable()
 export class LessonsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private examsService: ExamsService) {}
 
   async create(body: CreateLessonDTO) {
     const user = await this.prisma.user.findUnique({
@@ -63,5 +63,33 @@ export class LessonsService {
     })
 
     return lessons.map(item => item.lesson)
+  }
+
+  /**
+   * برای دریافت جزئیات درس مربوط به این دانشجو و آزمون‌های درس
+   * @param lessonID آیدی درس مدنظر
+   * @param studentID آیدی دانشجو مدنظر که از توکنش به دست می‌آید
+   */
+  async getStudentsLesson(lessonID: number, studentID: number) {
+    const pickedLesson = await this.prisma.pickedLesson.findUnique({
+      where: {
+        lessonID_studentID: {
+          lessonID,
+          studentID
+        }
+      },
+      include: {
+        lesson: true
+      }
+    })
+
+    if (!pickedLesson) return new BadRequestException('شما چنین درسی ندارید')
+
+    const exams = await this.examsService.studentExams(lessonID, studentID)
+
+    return {
+      lesson: pickedLesson.lesson,
+      exams,
+    }
   }
 }

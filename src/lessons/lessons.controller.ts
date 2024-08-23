@@ -4,6 +4,7 @@ import { LessonsService } from "./lessons.service"
 import { CreateLessonDTO } from "./dto/create-lesson.dto"
 import { RequestWithUser } from "type"
 import { AppService } from "src/app.service"
+import { GetLessonDTO } from "./dto/get-lesson.dto"
 
 @Controller('lesson')
 export class LessonsController {
@@ -22,18 +23,34 @@ export class LessonsController {
   }
 
   @UseGuards(AuthGuard(['superAdmin', 'admin', 'professor', 'student']))
+  @Post('/get')
+  async get(@Req() request: RequestWithUser, @Body() body: GetLessonDTO) {
+    const user = request.user
+    let lessonDetails
+
+    if (user.role === 'professor') {
+      // lessons = await this.lessonsService.professorsLessons(user.professorID)
+    } else if (user.role === 'student') {
+      lessonDetails = await this.lessonsService.getStudentsLesson(body.lessonID, user.studentID)
+    } else {
+      // lessons = await this.lessonsService.list()
+    }
+    return this.appService.myResponse({ ...lessonDetails })
+  }
+
+  @UseGuards(AuthGuard(['superAdmin', 'admin', 'professor', 'student']))
   @Get('list')
   async list(@Req() request: RequestWithUser) {
     const user = request.user
-    let response
+    let lessons
 
     if (user.role === 'professor') {
-      response = await this.lessonsService.professorsLessons(user.professorID)
+      lessons = await this.lessonsService.professorsLessons(user.professorID)
     } else if (user.role === 'student') {
-      response = await this.lessonsService.studentsLessons(user.studentID)
+      lessons = await this.lessonsService.studentsLessons(user.studentID)
     } else {
-      response = await this.lessonsService.list()
+      lessons = await this.lessonsService.list()
     }
-    return response
+    return this.appService.myResponse({ lessons })
   }
 }
