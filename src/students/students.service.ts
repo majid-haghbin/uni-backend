@@ -2,16 +2,23 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/database/prisma.service'
 import { CreateStudentDTO } from './dto/create-student.dto'
 import { AddToLessonDTO } from './dto/add-to-lesson.dto'
+import { UsersService } from 'src/users/users.service'
 
 @Injectable()
 export class StudentsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private userService: UsersService) {}
 
   async create(body: CreateStudentDTO) {
     const major = await this.prisma.major.findUnique({
       where: { id: body.majorID }
     })
     if (!major) return new BadRequestException('آیدی رشته تحصیلی اشتباه است')
+
+    const submittedWithSameMobile = await this.userService.findWithMobile(body.mobile)
+    if (submittedWithSameMobile) return new BadRequestException('کاربری با این شماره همراه قبلا ثبت شده است')
+
+    const submittedWithSameEmail = await this.userService.findWithEmail(body.email)
+    if (submittedWithSameEmail) return new BadRequestException('کاربری با این ایمیل قبلا ثبت شده است')
 
     const student = await this.prisma.user.create({
       data: {
