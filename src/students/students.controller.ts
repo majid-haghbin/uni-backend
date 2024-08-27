@@ -4,11 +4,13 @@ import { StudentsService } from "./students.service"
 import { CreateStudentDTO } from "./dto/create-student.dto"
 import { AddToLessonDTO } from "./dto/add-to-lesson.dto"
 import { LessonsService } from "src/lessons/lessons.service"
+import { AppService } from "src/app.service"
 
 @Controller('student')
 export class StudentsController {
   constructor(
     private readonly studentsService: StudentsService,
+    private readonly appService: AppService,
     private readonly lessonsService: LessonsService
   ) {}
 
@@ -41,7 +43,7 @@ export class StudentsController {
   @Get('admin/list')
   async studentsForAdmin() {
 
-    const response = await this.studentsService.getStudentsList()
-    return response
+    const students = await this.studentsService.getStudentsList()
+    return this.appService.myResponse({ students })
   }
 }
