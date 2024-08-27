@@ -106,4 +106,18 @@ export class StudentsService {
     })
     return response
   }
+
+  /**
+   * برای دریافت لیست دانشجویان کل سیستم توسط ادمین‌ها طراحی شده
+   * 
+   * منطقیست که ادمین به تمامی اطلاعات کاربر دسترسی دارد
+   */
+  async getStudentsList() {
+    const students = await this.prisma.student.findMany({
+      include: {
+        user: true
+      },
+    })
+    return students
+  }
 }

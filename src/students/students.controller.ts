@@ -1,12 +1,16 @@
-import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common"
+import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common"
 import { AuthGuard } from "src/auth/auth.guard"
 import { StudentsService } from "./students.service"
 import { CreateStudentDTO } from "./dto/create-student.dto"
 import { AddToLessonDTO } from "./dto/add-to-lesson.dto"
+import { LessonsService } from "src/lessons/lessons.service"
 
 @Controller('student')
 export class StudentsController {
-  constructor(private readonly studentsService: StudentsService) {}
+  constructor(
+    private readonly studentsService: StudentsService,
+    private readonly lessonsService: LessonsService
+  ) {}
 
   @UseGuards(AuthGuard(['superAdmin']))
   @Post('/create')
@@ -26,6 +30,18 @@ export class StudentsController {
   async addToLesson(@Body() body: AddToLessonDTO) {
 
     const response = await this.studentsService.addToLesson(body)
+    return response
+  }
+
+  /**
+   * به علت اینکه دیتایی که ادمین در لیست کاربران می‌بیند با دیتایی که اساتید در لیست دانشجویان
+   * می‌بینند متفاوت است این وب سرویس جداگانه طراحی شد
+   */
+  @UseGuards(AuthGuard(['superAdmin', 'admin']))
+  @Get('admin/list')
+  async studentsForAdmin() {
+
+    const response = await this.studentsService.getStudentsList()
     return response
   }
 }
