@@ -3,6 +3,8 @@ import { AuthGuard } from "src/auth/auth.guard"
 import { StudentsService } from "./students.service"
 import { CreateStudentDTO } from "./dto/create-student.dto"
 import { AddToLessonDTO } from "./dto/add-to-lesson.dto"
+import { RequestWithUser } from "type"
+import { ListStudentsDTO } from "../lessons/dto/students-list.dto"
 import { LessonsService } from "src/lessons/lessons.service"
 import { AppService } from "src/app.service"
 

@@ -139,4 +139,34 @@ export class LessonsService {
       exams,
     }
   }
+
+  /**
+   * برای دریافت دانشجویان این درس
+   * 
+   * @param lessonID آیدی درس مدنظر
+   */
+  async getStudents(lessonID: number) {
+    const lessons = await this.prisma.student.findMany({
+      where: {
+        pickedLessons: {
+          some: {
+            lessonID,
+          }
+        }
+      },
+      include: {
+        user: {
+          select: {
+            ID: true,
+            name: true,
+            family: true,
+            email: true,
+            mobile: true
+          }
+        }
+      }
+    })
+
+    return lessons
+  }
 }

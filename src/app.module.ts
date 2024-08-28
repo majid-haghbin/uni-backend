@@ -21,6 +21,7 @@ import { LessonsService } from './lessons/lessons.service'
 import { StudentsController } from './students/students.controller'
 import { ExamsController } from './exams/exams.controller'
 import { ExamsService } from './exams/exams.service'
+import { AccessService } from './access/access.service'
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { ExamsService } from './exams/exams.service'
     LessonsService,
     StudentsService,
     ExamsService,
+    AccessService,
   ],
   exports: [AuthService]
 })

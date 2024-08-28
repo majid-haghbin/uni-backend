@@ -5,12 +5,15 @@ import { CreateLessonDTO } from "./dto/create-lesson.dto"
 import { RequestWithUser } from "type"
 import { AppService } from "src/app.service"
 import { GetLessonDTO } from "./dto/get-lesson.dto"
+import { ListStudentsDTO } from "src/lessons/dto/students-list.dto"
+import { AccessService } from "src/access/access.service"
 
 @Controller('lesson')
 export class LessonsController {
   constructor(
     private readonly lessonsService: LessonsService,
-    private readonly appService: AppService
+    private readonly appService: AppService,
+    private readonly accessService: AccessService
   ) {}
 
   @UseGuards(AuthGuard(['superAdmin']))
@@ -52,5 +55,30 @@ export class LessonsController {
       lessons = await this.lessonsService.list()
     }
     return this.appService.myResponse({ lessons })
+  }
+
+  @UseGuards(AuthGuard(['professor', 'admin', 'superAdmin']))
+  @Post('student/list')
+  async listStudents(@Body() body: ListStudentsDTO, @Req() request: RequestWithUser) {
+    /**
+     * استاد فقط می‌تواند لیست دانشجویان یک درس را ببیند
+     * 
+     * ادمین و سوپر ادمین می‌توانند لیست دانشجویان کل سیستم را هم ببینند
+     */
+
+    const user = request.user
+
+    let students
+
+    if (user.role === 'professor') {
+      try {
+        await this.accessService.professorHasAccessToLesson(user.professorID, body.lessonID)
+      } catch(err) {
+        return err
+      }
+    }
+
+    students = await this.lessonsService.getStudents(body.lessonID)
+    return this.appService.myResponse({ students })
   }
 }
