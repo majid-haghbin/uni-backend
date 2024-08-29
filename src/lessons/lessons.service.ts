@@ -146,7 +146,7 @@ export class LessonsService {
    * @param lessonID آیدی درس مدنظر
    */
   async getStudents(lessonID: number) {
-    const lessons = await this.prisma.student.findMany({
+    const result = await this.prisma.student.findMany({
       where: {
         pickedLessons: {
           some: {
@@ -167,6 +167,8 @@ export class LessonsService {
       }
     })
 
-    return lessons
+    /** برای اینکه تاریخ تولد دانشجو را در اختیار استاد درس قرار ندهیم */
+    const students = result.map(({ birthDate, ...object }) => object)
+    return students
   }
 }
