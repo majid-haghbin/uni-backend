@@ -139,7 +139,7 @@ model Choice {
   questionID  Int
   question Question @relation(fields: [questionID], references: [id])
 
-  answer  Answer?
+  answer  Answer[]
 }
 
 model Attempt {
@@ -159,7 +159,7 @@ model Answer {
   id  Int @id @default(autoincrement())
   text  String?
 
-  choiceID  Int?  @unique
+  choiceID  Int?
   choice    Choice? @relation(fields: [choiceID], references: [id])
 
   attemptID   Int
