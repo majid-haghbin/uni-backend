@@ -1,12 +1,11 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common"
+import { Body, Controller, Post, UseGuards } from "@nestjs/common"
 import { AuthGuard } from "src/auth/auth.guard"
 import { StudentsService } from "./students.service"
 import { CreateStudentDTO } from "./dto/create-student.dto"
 import { AddToLessonDTO } from "./dto/add-to-lesson.dto"
-import { RequestWithUser } from "type"
-import { ListStudentsDTO } from "../lessons/dto/students-list.dto"
 import { LessonsService } from "src/lessons/lessons.service"
 import { AppService } from "src/app.service"
+import { StudentsAdminList } from "./dto/admin-list.dto"
 
 @Controller('student')
 export class StudentsController {
@@ -42,10 +41,9 @@ export class StudentsController {
    * می‌بینند متفاوت است این وب سرویس جداگانه طراحی شد
    */
   @UseGuards(AuthGuard(['superAdmin', 'admin']))
-  @Get('admin/list')
-  async studentsForAdmin() {
-
-    const students = await this.studentsService.getStudentsList()
+  @Post('admin/list')
+  async studentsForAdmin(@Body() body: StudentsAdminList) {
+    const students = await this.studentsService.getStudentsList(body)
     return this.appService.myResponse({ students })
   }
 }

@@ -3,6 +3,7 @@ import { PrismaService } from 'src/database/prisma.service'
 import { CreateStudentDTO } from './dto/create-student.dto'
 import { AddToLessonDTO } from './dto/add-to-lesson.dto'
 import { UsersService } from 'src/users/users.service'
+import { StudentsAdminList } from './dto/admin-list.dto'
 
 @Injectable()
 export class StudentsService {
@@ -119,12 +120,29 @@ export class StudentsService {
    * 
    * منطقیست که ادمین به تمامی اطلاعات کاربر دسترسی دارد
    */
-  async getStudentsList() {
-    const students = await this.prisma.student.findMany({
+  async getStudentsList(body: StudentsAdminList) {
+    if (!body.notInLesson) {
+      const students = await this.prisma.student.findMany({
+        include: {
+          user: true
+        },
+      })
+      return students
+    }
+
+    const studentsNotInLesson = await this.prisma.student.findMany({
+      where: {
+        pickedLessons: {
+          none: {
+            lessonID: body.notInLesson,
+          },
+        },
+      },
       include: {
         user: true
-      },
+      }
     })
-    return students
+
+    return studentsNotInLesson
   }
 }
