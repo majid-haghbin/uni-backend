@@ -130,19 +130,31 @@ export class StudentsService {
       return students
     }
 
-    const studentsNotInLesson = await this.prisma.student.findMany({
+    const lesson = await this.prisma.lesson.findUnique({
+      where: {
+        id: body.notInLesson
+      },
+      include: {
+        major: true
+      }
+    })
+    if (!lesson) return new BadRequestException('آیدی درس را صحیح وارد کنید')
+
+    // دانشجویانی را پیدا می‌کنیم که عضو این درس نیستند و به رشته‌ی تحصیلی این درس مربوط می‌شوند
+    const studentsNotInLessonAndRelatedToMajor = await this.prisma.student.findMany({
       where: {
         pickedLessons: {
           none: {
             lessonID: body.notInLesson,
           },
         },
+        majorID: lesson.major.id
       },
       include: {
         user: true
       }
     })
 
-    return studentsNotInLesson
+    return studentsNotInLessonAndRelatedToMajor
   }
 }
