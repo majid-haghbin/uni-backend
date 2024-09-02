@@ -4,6 +4,7 @@ import { CreateStudentDTO } from './dto/create-student.dto'
 import { AddToLessonDTO } from './dto/add-to-lesson.dto'
 import { UsersService } from 'src/users/users.service'
 import { StudentsAdminList } from './dto/admin-list.dto'
+import { RemoveFromLessonDTO } from './dto/remove-from-lesson.dto'
 
 @Injectable()
 export class StudentsService {
@@ -156,5 +157,28 @@ export class StudentsService {
     })
 
     return studentsNotInLessonAndRelatedToMajor
+  }
+
+  /** حذف دانشجو از یک درس */
+  async removeFromLesson(body: RemoveFromLessonDTO) {
+    const pickedLesson = await this.prisma.pickedLesson.findUnique({
+      where: {
+        lessonID_studentID: {
+          lessonID: body.lessonID,
+          studentID: body.studentID
+        }
+      }
+    })
+
+    if (!pickedLesson) return new BadRequestException('دانشجو چنین درسی ندارد')
+
+    return this.prisma.pickedLesson.delete({
+      where: {
+        lessonID_studentID: {
+          lessonID: body.lessonID,
+          studentID: body.studentID
+        }
+      }
+    })
   }
 }

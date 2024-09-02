@@ -36,6 +36,14 @@ export class StudentsController {
     return response
   }
 
+  @UseGuards(AuthGuard(['superAdmin', 'admin']))
+  @Post('lesson/remove')
+  async removeFromLesson(@Body() body: AddToLessonDTO) {
+
+    const response = await this.studentsService.removeFromLesson(body)
+    return response
+  }
+
   /**
    * به علت اینکه دیتایی که ادمین در لیست کاربران می‌بیند با دیتایی که اساتید در لیست دانشجویان
    * می‌بینند متفاوت است این وب سرویس جداگانه طراحی شد
