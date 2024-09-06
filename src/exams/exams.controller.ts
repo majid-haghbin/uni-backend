@@ -26,10 +26,16 @@ export class ExamsController {
     return response
   }
 
-  @UseGuards(AuthGuard(['professor']))
+  @UseGuards(AuthGuard(['professor', 'superAdmin', 'admin']))
   @Post('create')
   async create(@Body() body: CreateExamDto, @Req() request: RequestWithUser) {
-    const exam = await this.examsService.createExam(body, request.user.professorID)
+    let exam
+
+    if (request.user.role === 'professor') {
+      exam = await this.examsService.createExamByProfessor(body, request.user.professorID)
+    } else {
+      exam = await this.examsService.createExam(body)
+    }
     
     return exam
   }

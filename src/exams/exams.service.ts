@@ -61,16 +61,8 @@ export class ExamsService {
   /**
    * ایجاد آزمون
    * @param body 
-   * @param professorID آیدی استادی که می‌خواهد درس را ایجاد کند
-   * @returns 
    */
-  async createExam(body: CreateExamDto, professorID: number) {
-    const lesson = await this.prisma.lesson.findUnique({
-      where: { id: body.lessonID, professorID }
-    })
-    
-    if (!lesson) return new BadRequestException('آیدی درس اشتباه است')
-    
+  async createExam(body: CreateExamDto) {
     const now = Date.now() / 1000
     const exam = await this.prisma.exam.create({
       data: {
@@ -87,11 +79,23 @@ export class ExamsService {
       }
     })
 
-    body.questions.forEach(async question => {
-      await this.createQuestion(question, exam.id)
-    })
-
     return exam
+  }
+
+  /**
+   * ایجاد آزمون
+   * @param body 
+   * @param professorID آیدی استادی که می‌خواهد درس را ایجاد کند
+   * @returns 
+   */
+  async createExamByProfessor(body: CreateExamDto, professorID: number) {
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { id: body.lessonID, professorID }
+    })
+    
+    if (!lesson) return new BadRequestException('آیدی درس اشتباه است')
+    
+    return this.createExam(body)
   }
 
   /**
