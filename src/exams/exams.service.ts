@@ -1,6 +1,6 @@
 import { BadRequestException, HttpException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/database/prisma.service'
-import { CreateExamDto } from './dto/create-exam.dto'
+import { CreateExamDto, QuestionDto } from './dto/create-exam.dto'
 
 @Injectable()
 export class ExamsService {
@@ -38,7 +38,14 @@ export class ExamsService {
     if (!lesson) return new BadRequestException('آیدی درس اشتباه است')
 
     const exams = await this.prisma.exam.findMany({
-      where: { lessonID }
+      where: { lessonID },
+      include: {
+        attempts: {
+          include: {
+            _count: true
+          }
+        }
+      }
     })
 
     return exams
@@ -104,7 +111,7 @@ export class ExamsService {
    * @param examID آیدی امتحانی که این سوال به آن مربوط می‌شود
    * @returns سوالی که ایجاد شده
    */
-  async createQuestion(question: CreateExamDto['questions'][number], examID: number) {
+  async createQuestion(question: QuestionDto, examID: number) {
     const createdQuestion = await this.prisma.question.create({
       data: {
         exam: {
@@ -146,5 +153,44 @@ export class ExamsService {
         isClosed: true
       }
     })
+  }
+
+  async getExamForStudent(examID: number, studentID: number) {
+    const exam = await this.prisma.exam.findUnique({
+      where: { id: examID },
+      include: {
+        lesson: true,
+      }
+    })
+
+    if (!exam) return new BadRequestException('چنین آزمونی وجود ندارد')
+
+    const lesson = await this.prisma.pickedLesson.findUnique({
+      where: {
+        lessonID_studentID: {
+          lessonID: exam.lesson.id,
+          studentID,
+        }
+      }
+    })
+
+    if (!lesson) return new BadRequestException('چنین آزمونی وجود ندارد')
+
+    return this.getExamDetails(examID)
+  }
+
+  async getExamDetails(examID: number) {
+    const exam = await this.prisma.exam.findUnique({
+      where: { id: examID },
+      include: {
+        questions: {
+          include: {
+            choices: true
+          }
+        }
+      }
+    })
+
+    return exam
   }
 }

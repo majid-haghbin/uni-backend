@@ -13,13 +13,13 @@ import {
   ValidateNested
  } from 'class-validator'
 
-class Answer {
+export class AnswerDto {
   @IsNotEmpty()
   @IsString()
   text: string
 }
 
-class Question {
+export class QuestionDto {
   @IsNotEmpty()
   title: string
 
@@ -36,8 +36,8 @@ class Question {
   @ValidateNested({ each: true })
   @ArrayMinSize(2)
   @ArrayMaxSize(4)
-  @Type(() => Answer)
-  answers: Answer[]
+  @Type(() => AnswerDto)
+  answers: AnswerDto[]
 }
 
 export class CreateExamDto {
@@ -65,10 +65,10 @@ export class CreateExamDto {
   @IsNumberString()
   endDate: string
 
-  @IsNotEmpty()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @ArrayMinSize(1)
-  @Type(() => Question)
-  questions: Question[]
+  // @IsNotEmpty()
+  // @IsArray()
+  // @ValidateNested({ each: true })
+  // @ArrayMinSize(1)
+  // @Type(() => QuestionDto)
+  // questions: QuestionDto[]
 }

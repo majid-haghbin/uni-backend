@@ -5,10 +5,12 @@ import { RequestWithUser } from "type"
 import { ExamListDto } from "./dto/exam-list.dto"
 import { CreateExamDto } from "./dto/create-exam.dto"
 import { CloseExamDto } from "./dto/close-exam.dto"
+import { GetExamDto } from "./dto/get-exam.dto"
+import { AppService } from "src/app.service"
 
 @Controller('exam')
 export class ExamsController {
-  constructor(private readonly examsService: ExamsService) {}
+  constructor(private readonly examsService: ExamsService, private appService: AppService) {}
 
   @UseGuards(AuthGuard(['professor', 'student', 'superAdmin', 'admin']))
   @Post('list')
@@ -45,5 +47,19 @@ export class ExamsController {
   async close(@Body() body: CloseExamDto, @Req() request: RequestWithUser) {
     const response = await this.examsService.closeExam(body.examID, request.user.professorID)
     return response
+  }
+
+  @UseGuards(AuthGuard(['professor', 'superAdmin', 'admin', 'student']))
+  @Post('get')
+  async getExam(@Body() body: GetExamDto, @Req() request: RequestWithUser) {
+    let exam
+
+    if (['professor', 'admin', 'superAdmin'].includes(request.user.role)) {
+      exam = await this.examsService.getExamDetails(body.examID)
+    } else {
+      exam = await this.examsService.getExamForStudent(body.examID, request.user.studentID)
+    }
+    
+    return this.appService.myResponse({ exam })
   }
 }
