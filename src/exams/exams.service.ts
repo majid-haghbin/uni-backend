@@ -2,6 +2,7 @@ import { BadRequestException, HttpException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/database/prisma.service'
 import { CreateExamDto, QuestionDto } from './dto/create-exam.dto'
 import { SubmitAttemptDto } from './dto/submit-attempt.dto'
+import { User } from '@prisma/client'
 
 @Injectable()
 export class ExamsService {
@@ -231,5 +232,51 @@ export class ExamsService {
     } catch(err) {
       return err
     }
+  }
+  
+  async hasAccessToExamAttempts(examID: number, user: User) {
+    if (user.role === 'admin' || user.role === 'superAdmin') return true
+    else if (user.role === 'professor') {
+      const exam = await this.prisma.exam.findUnique({
+        where: { id: examID },
+        include: {
+          lesson: true
+        }
+      })
+
+      if (!exam) return false
+      if (exam.lesson.professorID === user.professorID) return true
+    } else {
+      const exam = await this.prisma.exam.findUnique({
+        where: { id: examID },
+        include: { lesson: true }
+      })
+
+      if (!exam) return false
+
+      const pickedLesson = await this.prisma.pickedLesson.findUnique({
+        where: {
+          lessonID_studentID: {
+            lessonID: exam.lesson.id,
+            studentID: user.studentID
+          }
+        }
+      })
+
+      if (!pickedLesson) return false
+      return true
+    }
+  }
+
+  async getExamAttempts(examID: number, user: User) {
+    const hasAccess = await this.hasAccessToExamAttempts(examID, user)
+    if (!hasAccess) return new BadRequestException('چنین آزمونی وجود ندارد')
+
+    return this.prisma.attempt.findMany({
+      where: {
+        examID,
+        studentID: user.role === 'student' ? user.studentID : undefined
+      }
+    })
   }
 }
