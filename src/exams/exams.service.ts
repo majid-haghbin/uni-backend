@@ -1,6 +1,7 @@
 import { BadRequestException, HttpException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/database/prisma.service'
 import { CreateExamDto, QuestionDto } from './dto/create-exam.dto'
+import { SubmitAttemptDto } from './dto/submit-attempt.dto'
 
 @Injectable()
 export class ExamsService {
@@ -192,5 +193,43 @@ export class ExamsService {
     })
 
     return exam
+  }
+
+  async submitExamAttempt(studentID: number, body: SubmitAttemptDto) {
+    const pickedLesson = await this.prisma.pickedLesson.findUnique({
+      where: {
+        lessonID_studentID: {
+          lessonID: body.lessonID,
+          studentID,
+        }
+      }
+    })
+
+    if (!pickedLesson) return new BadRequestException('چنین آزمونی وجود ندارد')
+
+    try {
+      const attempt = await this.prisma.attempt.create({
+        data: {
+          exam: { connect: { id: body.examID }},
+          student: { connect: { id: studentID }},
+          answers: {
+            create: body.answers.map(answer => ({
+              text: answer.text || null, // اگر پاسخ تشریحی بود
+              question: {
+                connect: { id: answer.questionID },
+              },
+              choice: answer.choiceID ?
+                { connect: { id: answer.choiceID } } :
+                undefined, // اگر تستی بود
+            })),
+          },
+          created: (Date.now() / 1000).toFixed()
+        }
+      })
+
+      return
+    } catch(err) {
+      return err
+    }
   }
 }

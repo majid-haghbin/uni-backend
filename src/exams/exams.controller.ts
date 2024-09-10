@@ -7,6 +7,7 @@ import { CreateExamDto } from "./dto/create-exam.dto"
 import { CloseExamDto } from "./dto/close-exam.dto"
 import { GetExamDto } from "./dto/get-exam.dto"
 import { AppService } from "src/app.service"
+import { SubmitAttemptDto } from "./dto/submit-attempt.dto"
 
 @Controller('exam')
 export class ExamsController {
@@ -61,5 +62,15 @@ export class ExamsController {
     }
     
     return this.appService.myResponse({ exam })
+  }
+
+  @UseGuards(AuthGuard(['student']))
+  @Post('attempt/submit')
+  async submitExam(@Body() body: SubmitAttemptDto, @Req() request: RequestWithUser) {
+    const { ID: userID, studentID } = request.user
+
+    const result = await this.examsService.submitExamAttempt(studentID, body)
+    
+    return this.appService.myResponse({})
   }
 }
