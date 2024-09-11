@@ -10,6 +10,7 @@ import { AppService } from "src/app.service"
 import { SubmitAttemptDto } from "./dto/submit-attempt.dto"
 import { GetExamAttemptsDto } from "./dto/get-exam-attempts.dto"
 import { ReviewAttemptDto } from "./dto/review-exam-attempt.dto"
+import { AddQuestionDto } from "./dto/add-question.dto"
 
 @Controller('exam')
 export class ExamsController {
@@ -96,6 +97,19 @@ export class ExamsController {
     try {
       const { attempt, exam } = await this.examsService.reviewExamAttempt(body.examID, body.attemptID, request.user)
       return this.appService.myResponse({ attempt, exam })
+
+    } catch(err) {
+      return err
+    }
+  }
+
+  @UseGuards(AuthGuard(['professor', 'superAdmin', 'admin']))
+  @Post('question/add')
+  async addQuestion(@Body() body: AddQuestionDto, @Req() request: RequestWithUser) {
+
+    try {
+      await this.examsService.addQuestion(body, request.user)
+      return this.appService.myResponse({ })
 
     } catch(err) {
       return err

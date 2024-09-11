@@ -3,6 +3,7 @@ import { PrismaService } from 'src/database/prisma.service'
 import { CreateExamDto, QuestionDto } from './dto/create-exam.dto'
 import { SubmitAttemptDto } from './dto/submit-attempt.dto'
 import { User } from '@prisma/client'
+import { AddQuestionDto } from './dto/add-question.dto'
 
 @Injectable()
 export class ExamsService {
@@ -356,5 +357,47 @@ export class ExamsService {
     })
 
     return { attempt, exam }
+  }
+
+  async canManageExam(examID: number, user: User) {
+    if (user.role === 'student') return false
+    if (user.role === 'admin' || user.role === 'superAdmin') return true
+
+    const exam = await this.prisma.exam.findUnique({
+      where: { id: examID },
+      include: { lesson: true }
+    })
+
+    if (!exam && exam.lesson.professorID !== user.professorID) return false
+    return true
+  }
+
+  async addQuestion(body: AddQuestionDto, user: User) {
+    const hasAccess = await this.canManageExam(body.examID, user)
+    if (!hasAccess) throw new Error('دسترسی این کار را ندارید')
+
+    await this.prisma.$transaction(async () => {
+      const createdQuestion = await this.prisma.question.create({
+        data: {
+          examID: body.examID,
+          title: body.title,
+          marks: body.marks,
+          isMultiChoice: body.isMultiChoice,
+        }
+      })
+
+      if (body.choices.length) {
+        body.choices.forEach(async (choice) => {
+          await this.prisma.choice.create({
+            data: {
+              questionID: createdQuestion.id,
+              text: choice.text
+            }
+          })
+        })
+      }
+    })
+
+    return
   }
 }
