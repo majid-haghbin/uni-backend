@@ -270,13 +270,29 @@ export class ExamsService {
 
   async getExamAttempts(examID: number, user: User) {
     const hasAccess = await this.hasAccessToExamAttempts(examID, user)
-    if (!hasAccess) return new BadRequestException('چنین آزمونی وجود ندارد')
+    if (!hasAccess) throw new BadRequestException('چنین آزمونی وجود ندارد')
 
-    return this.prisma.attempt.findMany({
+    const exam = await this.prisma.exam.findUnique({
+      where: { id: examID }
+    })
+
+    const attempts = await this.prisma.attempt.findMany({
       where: {
         examID,
         studentID: user.role === 'student' ? user.studentID : undefined
+      },
+      include: {
+        student: {
+          include: {
+            user: true
+          }
+        }
       }
     })
+
+    return {
+      exam,
+      attempts
+    }
   }
 }

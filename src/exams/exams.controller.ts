@@ -79,8 +79,12 @@ export class ExamsController {
   @Post('attempt/list')
   async getAttemptsList(@Body() body: GetExamAttemptsDto, @Req() request: RequestWithUser) {
 
-    const attempts = await this.examsService.getExamAttempts(body.examID, request.user)
-    
-    return this.appService.myResponse({ attempts })
+    try {
+      const { attempts, exam } = await this.examsService.getExamAttempts(body.examID, request.user)
+      return this.appService.myResponse({ attempts, exam })
+
+    } catch(err) {
+      return err
+    }
   }
 }
