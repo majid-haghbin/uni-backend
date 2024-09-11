@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/database/prisma.service'
 import { CreateExamDto, QuestionDto } from './dto/create-exam.dto'
 import { SubmitAttemptDto } from './dto/submit-attempt.dto'
@@ -234,6 +234,12 @@ export class ExamsService {
     }
   }
   
+  /**
+   * کاربر می تواند به لیست پاسخ‌های داده شده به این آزمون دسترسی پیدا کند یا خیر
+   * @param examID 
+   * @param attemptID 
+   * @param user 
+   */
   async hasAccessToExamAttempts(examID: number, user: User) {
     if (user.role === 'admin' || user.role === 'superAdmin') return true
     else if (user.role === 'professor') {
@@ -294,5 +300,61 @@ export class ExamsService {
       exam,
       attempts
     }
+  }
+
+  /**
+   * کاربر می تواند به پاسخ‌های داده شده به این آزمون دسترسی پیدا کند یا خیر
+   * @param examID 
+   * @param attemptID 
+   * @param user 
+   */
+  async hasAccessToAttempt(examID: number, attemptID: number, user: User) {
+    if (user.role === 'admin' || user.role === 'superAdmin') return true
+    else if (user.role === 'professor') {
+      const exam = await this.prisma.exam.findUnique({
+        where: { id: examID },
+        include: {
+          lesson: true
+        }
+      })
+
+      if (!exam) return false
+      if (exam.lesson.professorID === user.professorID) return true
+    } else {
+      const attempt = await this.prisma.attempt.findUnique({
+        where: { id: attemptID }
+      })
+
+      if (!attempt) return false
+      if (attempt.studentID === user.studentID) return true
+    }
+  }
+
+  async reviewExamAttempt(examID: number, attemptID: number, user: User) {
+    const hasAccess = await this.hasAccessToAttempt(examID, attemptID, user)
+    if (!hasAccess) throw new BadRequestException('به این پاسخ‌ها دسترسی ندارید')
+
+    const attempt = await this.prisma.attempt.findUnique({
+      where: { id: attemptID },
+      include: {
+        answers: true,
+        student: {
+          include: { user: true }
+        }
+      }
+    })
+
+    const exam = await this.prisma.exam.findUnique({
+      where: { id: attempt.examID },
+      include: {
+        questions: {
+          include: {
+            choices: true
+          }
+        },
+      }
+    })
+
+    return { attempt, exam }
   }
 }
